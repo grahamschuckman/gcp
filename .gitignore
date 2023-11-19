@@ -10,3 +10,6 @@
 
 # logs
 *.log
+
+# keys
+keys.json
