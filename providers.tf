@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "google" {
-  project = "kubernetesterraform-405517"
-  region  = "us-east4"
+  project     = "kubernetesterraform-405517"
+  region      = "us-east4"
   credentials = "./keys.json"
 }

@@ -9,7 +9,9 @@ Basic prototype of connecting to Google Cloud with Terraform.
 
 ## Providers
 
-No providers.
+| Name | Version |
+|------|---------|
+| google | 5.6.0 |
 
 ## Modules
 
@@ -17,7 +19,9 @@ No modules.
 
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [google_storage_bucket.state](https://registry.terraform.io/providers/hashicorp/google/5.6.0/docs/resources/storage_bucket) | resource |
 
 ## Inputs
 

@@ -10,10 +10,10 @@ resource "google_storage_bucket" "state" {
   versioning {
     enabled = false
   }
-#   encryption {
-#     default_kms_key_name = google_kms_crypto_key.terraform_state_bucket.id
-#   }
-#   depends_on = [
-#     google_project_iam_member.default
-#   ]
+  #   encryption {
+  #     default_kms_key_name = google_kms_crypto_key.terraform_state_bucket.id
+  #   }
+  #   depends_on = [
+  #     google_project_iam_member.default
+  #   ]
 }
