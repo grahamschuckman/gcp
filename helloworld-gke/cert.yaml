@@ -1,0 +1,8 @@
+# cert.yaml
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: ingress-test-cert
+spec:
+  domains:
+    - www.grahamschuckmangcp.com

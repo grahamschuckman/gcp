@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+    # name: 2048-pod
+    name: wiz-dev-app-pod
+    labels:
+        # app: 2048-ws
+        app: wiz-dev-app
+spec:
+    containers:
+    # - name: modeler-v2-oidc-dev
+    # - name: 2048-container
+    - name: wiz-dev-app
+      # image: 119243463525.dkr.ecr.us-east-1.amazonaws.com/credential-repository:oam-dev
+      # image: 119243463525.dkr.ecr.us-east-1.amazonaws.com/modeler-v2-repository:modeler-v2-oidc-dev
+      # image: blackicebird/2048
+      # image: 119243463525.dkr.ecr.us-east-1.amazonaws.com/modeler-v2-repository:2048
+      image: 341320276178.dkr.ecr.us-east-1.amazonaws.com/wiz-repository:wiz-dev-app
+      # ports:
+      #   - containerPort: 80
+      ports:
+        - containerPort: 8000
+    # - name: modeler-v2-proxy-dev
+    #   image: 119243463525.dkr.ecr.us-east-1.amazonaws.com/modeler-v2-repository:modeler-v2-proxy-dev
+    #   ports:
+    #     - containerPort: 8443

@@ -1,0 +1,40 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "SSMInstanceConnect",
+            "Effect": "Allow",
+            "Action": [
+                "ssmmessages:CreateControlChannel",
+                "ssmmessages:CreateDataChannel",
+                "ssmmessages:OpenControlChannel",
+                "ssmmessages:OpenDataChannel",
+                "ssm:StartSession",
+                "ssm:ResumeSession",
+                "ssm:TerminateSession",
+                "ssm:UpdateInstanceInformation",
+                "ssm:ListCommands",
+                "ssm:ListCommandInvocations",
+                "ssm:ListDocumentVersions",
+                "ssm:ListDocuments"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "SSMParameters",
+            "Effect": "Allow",
+            "Action": [
+                "ssm:GetParameter"
+            ],
+            "Resource": "arn:aws:ssm:us-east-1:341320276178:parameter/mongodb_password"
+        },
+        {
+            "Sid": "LazyS3Permissions",
+            "Effect": "Allow",
+            "Action": [
+                "s3:*"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

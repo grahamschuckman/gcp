@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world-1
+spec:
+  type: NodePort
+  selector:
+    greeting: hello
+    version: one
+  # GKE forwards requests sent to the Service on TCP port 60000 to one of the member Pods on TCP port 50000
+  ports:
+  - protocol: TCP
+    port: 60000
+    targetPort: 50000

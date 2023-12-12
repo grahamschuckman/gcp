@@ -1,0 +1,17 @@
+# This command should also do the same: https://kubernetes.io/docs/reference/access-authn-authz/rbac/#:~:text=kubectl%20create%20clusterrolebinding%20add,%3Dkube%2Dsystem%3Adefault
+apiVersion: rbac.authorization.k8s.io/v1
+# Need to bind the cluster role to the default ServiceAccount
+kind: ClusterRoleBinding
+metadata:
+  name: my-cluster-admin-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  # Do not need to create a separate role yml file since this is built into EKS
+  name: cluster-admin
+subjects:
+# Use the ServiceAccount "default" since that is the ServiceAccount assigned to the pod automatically by EKS
+- kind: ServiceAccount
+  name: default
+  # Use the namespace of the app defined in the deployment
+  namespace: wiz-dev-app

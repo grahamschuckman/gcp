@@ -1,0 +1,80 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: wiz-dev-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: wiz-dev-app
+  name: deployment-wiz-dev-app
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: wiz-dev-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wiz-dev-app
+    spec:
+      containers:
+      - image: 341320276178.dkr.ecr.us-east-1.amazonaws.com/wiz-repository:wiz-dev-app
+        imagePullPolicy: Always
+        name: wiz-dev-app
+        ports:
+        - containerPort: 8080
+      - image: 341320276178.dkr.ecr.us-east-1.amazonaws.com/wiz-repository:wiz-dev-proxy
+        imagePullPolicy: Always
+        name: wiz-dev-proxy
+        ports:
+        - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: wiz-dev-app
+  name: wiz-dev-app-service
+spec:
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: wiz-dev-app
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: wiz-dev-app
+  name: wiz-dev-app-ingress
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    # For each `listen-ports` object defined an ALB lister is created
+    # For each listener created the rules defined in `spec` apply with some basic caveats
+    # SSL redirect rule is applied only to the HTTP listener.  Cognito authentication rule
+    # is applied to the HTTPS listener
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    # Detailed redirect settings
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:341320276178:certificate/46593065-f211-4dec-9fc0-533afdc722c9
+    alb.ingress.kubernetes.io/backend-protocol: HTTP
+    alb.ingress.kubernetes.io/healthcheck-port: '8000'
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+    alb.ingress.kubernetes.io/success-codes: 200-399
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: wiz-dev-app-service
+              port:
+                number: 8000

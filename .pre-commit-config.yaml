@@ -1,0 +1,15 @@
+repos:
+- repo: https://github.com/antonbabenko/pre-commit-terraform
+  rev: v1.83.6
+  # not using CodeCommit repo because there is not a good way to pass credentials into container when running locally
+  # would work easily for CodeBuild jobs, but not local devs running pre-commit before pushing
+  # any changes made by these hooks are staged and then reviewed, not committed directly
+  hooks:
+    - id: terraform_fmt
+    # - id: terraform_tflint
+    # - id: terraform_docs
+    #   args:
+    #     - --args=--anchor=false
+    #     - --args=--html=false
+    # - id: terraform_tfsec
+    # - id: checkov
