@@ -1,0 +1,111 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: modeler-v2-dev
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: modeler-v2-dev
+  name: deployment-modeler-v2-dev
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app-modeler-v2-dev
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: app-modeler-v2-dev
+    spec:
+      containers:
+      - image: 119243463525.dkr.ecr.us-east-1.amazonaws.com/modeler-v2-repository:modeler-v2-oidc-dev
+        imagePullPolicy: Always
+        name: app-modeler-v2-oidc-dev
+        ports:
+        - containerPort: 8000
+      - image: 119243463525.dkr.ecr.us-east-1.amazonaws.com/modeler-v2-repository:modeler-v2-proxy-dev
+        imagePullPolicy: Always
+        name: app-modeler-v2-proxy-dev
+        ports:
+        - containerPort: 8443
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: modeler-v2-dev
+  name: service-modeler-v2-dev
+spec:
+  ports:
+    - port: 8443
+      targetPort: 8443
+      protocol: TCP
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: app-modeler-v2-dev
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: modeler-v2-dev
+  name: ingress-modeler-v2-dev
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    # For each `listen-ports` object defined an ALB lister is created
+    # For each listener created the rules defined in `spec` apply with some basic caveats
+    # SSL redirect rule is applied only to the HTTP listener.  Cognito authentication rule
+    # is applied to the HTTPS listener
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    # Detailed redirect settings
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:083790825559:certificate/57a2a1f4-8eec-4308-bdaf-f041e5f56010
+    alb.ingress.kubernetes.io/backend-protocol: HTTPS
+    alb.ingress.kubernetes.io/healthcheck-port: '8443'
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTPS
+    alb.ingress.kubernetes.io/healthcheck-path: '/health'
+    alb.ingress.kubernetes.io/success-codes: 200-399
+    # Need to setup OIDC
+    alb.ingress.kubernetes.io/auth-idp-oidc: '{"issuer":"https://myplan.oktapreview.com/oauth2/default","authorizationEndpoint":"https://myplan.oktapreview.com/oauth2/default/v1/authorize","tokenEndpoint":"https://myplan.oktapreview.com/oauth2/default/v1/token","userInfoEndpoint":"https://myplan.oktapreview.com/oauth2/default/v1/userinfo","secretName":"modeler-v2-dev-creds"}'
+    alb.ingress.kubernetes.io/auth-on-unauthenticated-request: authenticate
+    alb.ingress.kubernetes.io/auth-type: oidc
+    # Session timeout on authentication credentials
+    alb.ingress.kubernetes.io/auth-session-timeout: '3600'
+    # Required parameter for ALB/Cognito integration
+    alb.ingress.kubernetes.io/auth-scope: openid
+    # # Session cookie name
+    # alb.ingress.kubernetes.io/auth-session-cookie: AWSELBAuthSessionCookie
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+          # This first path should perform an ssl-redirect as below
+          # - path: /
+          #   pathType: Prefix
+          #   backend:
+          #     service:
+          #       name: ssl-redirect
+          #       # Configured via the redirect settings in the annotations
+          #       port:
+          #         name: use-annotation
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: service-modeler-v2-dev
+                port:
+                  number: 8443
+---
+# Helpful documentation: https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/guide/ingress/annotations/
+apiVersion: v1
+kind: Secret 
+metadata: 
+  namespace: modeler-v2-dev
+  name: modeler-v2-dev-creds
+data: 
+  clientID: <insert-here>
+  clientSecret: <insert-here>

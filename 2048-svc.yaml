@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+    name: game-2048-svc
+spec:
+    # Use the app label, not the metadata name, from the pod yaml to tell the load balancer which pod to send traffic to
+    selector:
+        app: 2048-ws
+    ports:
+    - protocol: TCP
+      # Port is the container port exposed by the deployment
+      port: 8443
+      # Target port is the port on the host machine that traffic is directed to
+      targetPort: 8443
+    type: LoadBalancer
+    # loadBalancerSourceRanges:
+    # - 136.226.18.0/23
