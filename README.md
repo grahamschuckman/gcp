@@ -246,6 +246,12 @@ Weird that you cannot do it to individual instances easily. Seems to be more app
 ## Associate static IP address from service or ingress with domain name in GKE
 https://cloud.google.com/kubernetes-engine/docs/tutorials/configuring-domain-name-static-ip?_ga=2.145338164.-1687914125.1702268716
 
+## Needed to associate a service account with the GCP Compute Engine VM running MongoDB
+Required access to Storage for Read Write permissions so it could talk to the bucket for backups.
+
+## Used a custom metadata startup-script to install MongoDB and configure the VM
+Was able to use the same one as I did for the AWS instance and then SSHd onto the box and fixed some things manually.
+
 # Kubernetes Notes
 
 ## Not sure why the official Terraform EKS cluster module was giving me so much trouble. Will just build the resources by hand.
